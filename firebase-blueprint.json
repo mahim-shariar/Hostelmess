@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "phone": "string?",
+        "photoURL": "string?",
+        "activeMessId": "string?",
+        "createdAt": "timestamp"
+      }
+    },
+    "Mess": {
+      "collection": "messes",
+      "fields": {
+        "id": "string",
+        "name": "string",
+        "adminId": "string",
+        "adminName": "string",
+        "phone": "string",
+        "email": "string",
+        "currency": "string",
+        "location": "string?",
+        "inviteCode": "string",
+        "settings": "object",
+        "createdAt": "timestamp"
+      }
+    },
+    "Member": {
+      "collection": "messes/{messId}/members",
+      "fields": {
+        "id": "string",
+        "userId": "string",
+        "name": "string",
+        "email": "string",
+        "phone": "string?",
+        "studentId": "string?",
+        "role": "string",
+        "status": "string",
+        "joiningDate": "string",
+        "permissions": "object"
+      }
+    },
+    "Meal": {
+      "collection": "messes/{messId}/meals",
+      "fields": {
+        "id": "string",
+        "memberId": "string",
+        "memberName": "string",
+        "date": "string",
+        "breakfast": "number",
+        "lunch": "number",
+        "dinner": "number",
+        "guestLunch": "number?",
+        "guestDinner": "number?",
+        "total": "number",
+        "monthId": "string"
+      }
+    },
+    "Expense": {
+      "collection": "messes/{messId}/expenses",
+      "fields": {
+        "id": "string",
+        "amount": "number",
+        "category": "string",
+        "description": "string",
+        "date": "string",
+        "paidBy": "string",
+        "paidByName": "string",
+        "paymentMethod": "string",
+        "receiptUrl": "string?",
+        "status": "string",
+        "monthId": "string"
+      }
+    },
+    "Payment": {
+      "collection": "messes/{messId}/payments",
+      "fields": {
+        "id": "string",
+        "memberId": "string",
+        "memberName": "string",
+        "amount": "number",
+        "date": "string",
+        "paymentMethod": "string",
+        "transactionId": "string?",
+        "note": "string?",
+        "monthId": "string"
+      }
+    },
+    "MonthlyAccount": {
+      "collection": "messes/{messId}/monthlyAccounts",
+      "fields": {
+        "monthId": "string",
+        "isClosed": "boolean",
+        "closedAt": "timestamp?",
+        "totalMeals": "number",
+        "totalFoodExpense": "number",
+        "totalOtherExpense": "number",
+        "mealRate": "number",
+        "totalPayments": "number",
+        "totalDue": "number",
+        "totalAdvance": "number"
+      }
+    },
+    "Notice": {
+      "collection": "messes/{messId}/notices",
+      "fields": {
+        "id": "string",
+        "title": "string",
+        "content": "string",
+        "authorName": "string",
+        "createdAt": "timestamp"
+      }
+    },
+    "AuditLog": {
+      "collection": "messes/{messId}/auditLogs",
+      "fields": {
+        "id": "string",
+        "action": "string",
+        "userId": "string",
+        "userName": "string",
+        "target": "string",
+        "oldValue": "string?",
+        "newValue": "string?",
+        "timestamp": "timestamp"
+      }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isMessMember(messId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/messes/$(messId)/members/$(request.auth.uid));
+    }
+
+    function getMemberData(messId) {
+      return get(/databases/$(database)/documents/messes/$(messId)/members/$(request.auth.uid)).data;
+    }
+
+    function isMessAdmin(messId) {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/messes/$(messId)) && 
+         get(/databases/$(database)/documents/messes/$(messId)).data.adminId == request.auth.uid) ||
+        (isMessMember(messId) && getMemberData(messId).role == 'admin')
+      );
+    }
+
+    function hasPermission(messId, perm) {
+      return isMessAdmin(messId) || (
+        isMessMember(messId) && 
+        getMemberData(messId).permissions[perm] == true
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isUser(userId);
+    }
+
+    // Messes collection
+    match /messes/{messId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isMessAdmin(messId);
+
+      // Members subcollection
+      match /members/{memberId} {
+        allow read: if isAuthenticated();
+        // Admin can manage members; a user can join themselves with 'member' role initially
+        allow create: if isAuthenticated() && (
+          isMessAdmin(messId) || 
+          (request.auth.uid == memberId && request.resource.data.role == 'member')
+        );
+        allow update: if isMessAdmin(messId) || (
+          request.auth.uid == memberId && 
+          request.resource.data.role == resource.data.role && 
+          request.resource.data.permissions == resource.data.permissions
+        );
+        allow delete: if isMessAdmin(messId);
+      }
+
+      // Meals subcollection
+      match /meals/{mealId} {
+        allow read: if isMessMember(messId) || isMessAdmin(messId);
+        allow create: if isMessAdmin(messId) || (
+          isMessMember(messId) && 
+          hasPermission(messId, 'addOwnMeal') && 
+          request.resource.data.memberId == request.auth.uid
+        );
+        allow update: if isMessAdmin(messId) || (
+          isMessMember(messId) && 
+          hasPermission(messId, 'editOwnMeal') && 
+          resource.data.memberId == request.auth.uid
+        );
+        allow delete: if isMessAdmin(messId);
+      }
+
+      // Expenses subcollection
+      match /expenses/{expenseId} {
+        allow read: if isMessAdmin(messId) || (
+          isMessMember(messId) && hasPermission(messId, 'viewExpenses')
+        );
+        allow create: if isMessAdmin(messId) || (
+          isMessMember(messId) && hasPermission(messId, 'addExpense')
+        );
+        allow update: if isMessAdmin(messId) || (
+          isMessMember(messId) && 
+          resource.data.paidBy == request.auth.uid && 
+          resource.data.status != 'approved'
+        );
+        allow delete: if isMessAdmin(messId);
+      }
+
+      // Payments subcollection
+      match /payments/{paymentId} {
+        allow read: if isMessAdmin(messId) || (
+          isMessMember(messId) && (
+            resource.data.memberId == request.auth.uid || 
+            hasPermission(messId, 'viewPayments')
+          )
+        );
+        allow create: if isMessAdmin(messId) || (
+          isMessMember(messId) && (
+            hasPermission(messId, 'addPayment') ||
+            request.resource.data.memberId == request.auth.uid
+          )
+        );
+        allow update, delete: if isMessAdmin(messId);
+      }
+
+      // Monthly Accounts subcollection
+      match /monthlyAccounts/{monthId} {
+        allow read: if isMessMember(messId) || isMessAdmin(messId);
+        allow write: if isMessAdmin(messId);
+      }
+
+      // Notices subcollection
+      match /notices/{noticeId} {
+        allow read: if isMessMember(messId) || isMessAdmin(messId);
+        allow write: if isMessAdmin(messId);
+      }
+
+      // Audit Logs subcollection
+      match /auditLogs/{logId} {
+        allow read: if isMessAdmin(messId);
+        allow create: if isAuthenticated();
+        allow update, delete: if false;
+      }
+    }
+  }
+}
