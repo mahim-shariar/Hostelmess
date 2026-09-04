@@ -15,6 +15,11 @@ import { Toast } from './components/ui/Toast';
 import { AuthModal } from './components/auth/AuthModal';
 import { JoinOrCreateMessModal } from './components/mess/JoinOrCreateMessModal';
 import { AddDepositModal } from './components/payments/AddDepositModal';
+import { CookSummaryModal } from './components/mess/CookSummaryModal';
+import { EditBazaarModal } from './components/mess/EditBazaarModal';
+import { MessHeaderCard } from './components/mess/MessHeaderCard';
+import { QuickBazaarModal } from './components/expenses/QuickBazaarModal';
+import { QuickBazaarFloatingButton } from './components/expenses/QuickBazaarFloatingButton';
 
 const AppContent: React.FC = () => {
   const { 
@@ -52,6 +57,7 @@ const AppContent: React.FC = () => {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [isQuickBazaarOpen, setIsQuickBazaarOpen] = useState(false);
 
   // Render current tab content
   const renderContent = () => {
@@ -61,6 +67,7 @@ const AppContent: React.FC = () => {
           <MemberDashboard
             onGoToMeals={() => setActiveTab('meals')}
             onGoToAccount={() => setActiveTab('account')}
+            onOpenQuickBazaar={() => setIsQuickBazaarOpen(true)}
             onAddExpense={() => {
               setActiveTab('expenses');
               setIsAddExpenseOpen(true);
@@ -74,6 +81,7 @@ const AppContent: React.FC = () => {
             onGoToMeals={() => setActiveTab('meals')}
             onGoToExpenses={() => setActiveTab('expenses')}
             onGoToMembers={() => setActiveTab('members')}
+            onOpenQuickBazaar={() => setIsQuickBazaarOpen(true)}
             onOpenAddExpense={() => {
               setActiveTab('expenses');
               setIsAddExpenseOpen(true);
@@ -144,8 +152,11 @@ const AppContent: React.FC = () => {
         onOpenNotices={() => setActiveTab('more')}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-4 sm:py-6">
+      {/* Main Content Area - with responsive padding for comfortable mobile view */}
+      <main className="flex-1 w-full max-w-4xl mx-auto px-3.5 sm:px-6 pt-3.5 sm:pt-6 pb-24 sm:pb-12">
+        {/* Proper dedicated section for Mess Identity & Invitation */}
+        <MessHeaderCard />
+
         {renderContent()}
       </main>
 
@@ -156,6 +167,12 @@ const AppContent: React.FC = () => {
           setIsAddModalOpen={setIsAddPaymentOpen}
         />
       )}
+
+      {/* Cook Daily Plate Count Sheet & WhatsApp Modal */}
+      <CookSummaryModal />
+
+      {/* Edit Daily Bazaar Duty Roster Modal */}
+      <EditBazaarModal />
 
       {/* Interactive First-time Walkthrough / Tutorial */}
       <TutorialModal />
@@ -168,6 +185,15 @@ const AppContent: React.FC = () => {
 
       {/* Member Deposit Modal */}
       <AddDepositModal />
+
+      {/* Floating Quick Add Bazar Expense Button */}
+      <QuickBazaarFloatingButton onClick={() => setIsQuickBazaarOpen(true)} />
+
+      {/* Immediate Quick Add Bazar Expense Modal */}
+      <QuickBazaarModal 
+        isOpen={isQuickBazaarOpen} 
+        onClose={() => setIsQuickBazaarOpen(false)} 
+      />
 
       {/* Notification Toast */}
       <Toast />

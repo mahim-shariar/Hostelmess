@@ -22,12 +22,15 @@ import {
 import { formatMonthDisplay } from '../../lib/accounting';
 import { Modal } from '../ui/Modal';
 import confetti from 'canvas-confetti';
+import { BazaarDutyCard } from '../mess/BazaarDutyCard';
+import { QuickBazaarWidget } from '../expenses/QuickBazaarWidget';
 
 interface AdminDashboardProps {
   onGoToMeals: () => void;
   onGoToExpenses: () => void;
   onGoToMembers: () => void;
   onOpenAddExpense: () => void;
+  onOpenQuickBazaar?: () => void;
   onOpenAddPayment: () => void;
   onOpenAddMember: () => void;
   onOpenNotices: () => void;
@@ -38,6 +41,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onGoToExpenses,
   onGoToMembers,
   onOpenAddExpense,
+  onOpenQuickBazaar,
   onOpenAddPayment,
   onOpenAddMember,
   onOpenNotices,
@@ -157,18 +161,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* 9 MAIN STATS CARDS (Requirement 20) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2.5 sm:gap-4">
         
         {/* 1. Members */}
         <div 
           onClick={onGoToMembers}
-          className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
+          className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.membersCount}</span>
             <Users className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
             {monthlyCalculations.totalMembers}
           </p>
           <span className="text-[10px] text-slate-400">Active students</span>
@@ -177,13 +181,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 2. Today's Meals */}
         <div 
           onClick={onGoToMeals}
-          className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
+          className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.todaysTotalMeals}</span>
             <Utensils className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
             {todaysMealsCount}
           </p>
           <span className="text-[10px] text-slate-400">{todayStr}</span>
@@ -192,13 +196,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 3. Total Meals */}
         <div 
           onClick={onGoToMeals}
-          className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
+          className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.totalMeals}</span>
             <Utensils className="w-4 h-4 text-indigo-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
+          <p className="text-lg sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
             {monthlyCalculations.totalMeals.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">In {selectedMonth}</span>
@@ -207,13 +211,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 4. Food Expense */}
         <div 
           onClick={onGoToExpenses}
-          className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
+          className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.foodExpense}</span>
             <ShoppingBag className="w-4 h-4 text-rose-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
             {currentMess.currency}{monthlyCalculations.totalFoodExpense.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">Bazar &amp; Groceries</span>
@@ -222,25 +226,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 5. Other Expense */}
         <div 
           onClick={onGoToExpenses}
-          className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
+          className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500 transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.otherExpense}</span>
             <ReceiptText className="w-4 h-4 text-amber-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
             {currentMess.currency}{monthlyCalculations.totalOtherExpense.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">Gas, Net, Bills</span>
         </div>
 
         {/* 6. Meal Rate (HIGHLIGHT) */}
-        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-4 rounded-2xl shadow-md shadow-emerald-600/20">
+        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-3.5 sm:p-4 rounded-2xl shadow-md shadow-emerald-600/20">
           <div className="flex items-center justify-between text-emerald-100 text-xs mb-1">
             <span className="font-semibold">{t.mealRate}</span>
             <Scale className="w-4 h-4" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black">
+          <p className="text-xl sm:text-3xl font-black">
             {currentMess.currency}{monthlyCalculations.mealRate}
           </p>
           <span className="text-[10px] text-emerald-100">
@@ -249,36 +253,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* 7. Total Payments */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.totalPayments}</span>
             <CreditCard className="w-4 h-4 text-emerald-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <p className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
             {currentMess.currency}{monthlyCalculations.totalPayments.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">Deposits collected</span>
         </div>
 
         {/* 8. Total Due */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.totalDue}</span>
             <TrendingDown className="w-4 h-4 text-rose-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400">
+          <p className="text-lg sm:text-2xl font-black text-rose-600 dark:text-rose-400">
             {currentMess.currency}{monthlyCalculations.totalDue.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">To be collected</span>
         </div>
 
         {/* 9. Total Advance */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs mb-1">
             <span>{t.totalAdvance}</span>
             <TrendingUp className="w-4 h-4 text-cyan-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-cyan-600 dark:text-cyan-400">
+          <p className="text-lg sm:text-2xl font-black text-cyan-600 dark:text-cyan-400">
             {currentMess.currency}{monthlyCalculations.totalAdvance.toLocaleString()}
           </p>
           <span className="text-[10px] text-slate-400">Prepaid balance</span>
@@ -287,7 +291,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* QUICK ACTIONS ROW */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
           {t.quickActions}
         </h3>
@@ -295,7 +299,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <button
             id="btn-admin-add-expense"
-            onClick={onOpenAddExpense}
+            onClick={onOpenQuickBazaar || onOpenAddExpense}
             className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-xs font-bold transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -331,8 +335,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
+      {/* DAILY BAZAAR INSTANT ENTRY WIDGET */}
+      <QuickBazaarWidget onOpenDetailedModal={onOpenQuickBazaar || onOpenAddExpense} />
+
+      {/* BAZAAR ROSTER */}
+      <BazaarDutyCard 
+        onOpenAddExpense={onOpenAddExpense}
+        onOpenQuickBazaar={onOpenQuickBazaar} 
+      />
+
       {/* QUICK MEMBER BALANCES PREVIEW (Top 5) */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-bold text-slate-900 dark:text-white text-base">

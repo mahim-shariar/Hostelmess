@@ -172,7 +172,7 @@ export const translations = {
     tutorial: 'Quick Interactive Tutorial',
     auditLogs: 'Audit Logs',
     logout: 'Log Out',
-    switchRole: 'Quick Demo Switch Role',
+    switchRole: 'Profile & Account',
 
     // Tutorial Steps
     tut1Title: 'Welcome to Hostel & Mess Manager',
@@ -363,7 +363,7 @@ export const translations = {
     tutorial: 'ব্যবহার নির্দেশিকা (টিউটোরিয়াল)',
     auditLogs: 'অডিট লগ',
     logout: 'লগআউট',
-    switchRole: 'ডেমো অ্যাকাউন্ট পরিবর্তন',
+    switchRole: 'প্রোফাইল ও অ্যাকাউন্ট',
 
     // Tutorial Steps
     tut1Title: 'হোস্টেল ও মেস ম্যানেজারে স্বাগতম',

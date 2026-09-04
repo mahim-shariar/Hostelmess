@@ -21,7 +21,6 @@ export const CookSummaryModal: React.FC = () => {
     meals, 
     currentMess, 
     allMembers, 
-    dailyMenus, 
     bazaarDuties,
     monthlyCalculations,
     selectedMonth,
@@ -47,8 +46,7 @@ export const CookSummaryModal: React.FC = () => {
 
   const grandTotal = breakfastTotal + lunchTotal + dinnerTotal;
 
-  // Active menu & duty
-  const todayMenu = dailyMenus[todayStr];
+  // Active bazaar duty
   const todayDuty = bazaarDuties[todayStr];
 
   // WhatsApp formatted string for today's cook sheet
@@ -62,9 +60,6 @@ export const CookSummaryModal: React.FC = () => {
 🍛 *Dinner:* ${dinnerTotal} plates (Regular: ${dinnerRegular}, Guest: ${dinnerGuest})
 ━━━━━━━━━━━━━━━━━━
 📊 *Total Plates Today:* ${grandTotal}
-
-🍲 *Lunch Menu:* ${todayMenu?.lunch || 'Standard Menu'}
-🍛 *Dinner Menu:* ${todayMenu?.dinner || 'Standard Menu'}
 🛒 *Bazar Duty:* ${todayDuty?.assignedNames?.join(', ') || 'Self Managed'}
 
 _Generated automatically via Hostel & Mess Manager_`;

@@ -27,7 +27,6 @@ export const AuthModal: React.FC = () => {
     signupWithUsername, 
     logout,
     currentUser,
-    switchDemoProfile,
     allMembers,
     setIsJoinCreateMessOpen
   } = useApp();
@@ -104,14 +103,6 @@ export const AuthModal: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSelectDemo = (memberId: string) => {
-    switchDemoProfile(memberId);
-    setSuccessMsg(`Switched active profile!`);
-    setTimeout(() => {
-      setIsAuthModalOpen(false);
-    }, 500);
   };
 
   return (
@@ -337,38 +328,6 @@ export const AuthModal: React.FC = () => {
             </form>
           </>
         )}
-
-        {/* Quick Demo Access (for seamless test navigation) */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-amber-500" /> Instant Demo Profiles:
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleSelectDemo('user_mahim_admin')}
-              className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 text-left transition-all cursor-pointer"
-            >
-              <div className="flex items-center gap-1 text-emerald-600 font-bold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Mahim (Manager)</span>
-              </div>
-              <span className="text-[10px] text-slate-400">Full admin controls</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSelectDemo('user_sabbir_member')}
-              className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 text-left transition-all cursor-pointer"
-            >
-              <div className="flex items-center gap-1 text-indigo-600 font-bold">
-                <Users className="w-3.5 h-3.5" />
-                <span>Sabbir (Member)</span>
-              </div>
-              <span className="text-[10px] text-slate-400">Add meals & deposits</span>
-            </button>
-          </div>
-        </div>
 
       </div>
     </Modal>

@@ -14,7 +14,10 @@ import {
   DollarSign, 
   ShieldCheck, 
   FileText,
-  Lock
+  Lock,
+  Sun,
+  Moon,
+  Laptop
 } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Notice } from '../../types';
@@ -39,6 +42,8 @@ export const MoreSettings: React.FC<MoreSettingsProps> = ({
     deleteNotice, 
     lang, 
     setLang, 
+    theme,
+    setTheme,
     t 
   } = useApp();
 
@@ -113,36 +118,8 @@ export const MoreSettings: React.FC<MoreSettingsProps> = ({
         </p>
       </div>
 
-      {/* QUICK SWITCH USER DEMO BAR */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2.5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-            Switch Active Profile (Demo / Testing)
-          </span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
-            Current: {currentUser.name} ({currentUser.role})
-          </span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {allMembers.slice(0, 4).map(m => (
-            <button
-              key={m.id}
-              onClick={() => setCurrentUser(m)}
-              className={`p-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                currentUser.id === m.id
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              <span>{m.name.split(' ')[0]}</span>
-              <span className="text-[10px] opacity-75 font-normal">({m.role === 'admin' ? 'Admin' : 'Member'})</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* NOTICE BOARD (Requirement 27) */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600">
@@ -201,7 +178,7 @@ export const MoreSettings: React.FC<MoreSettingsProps> = ({
       </div>
 
       {/* MORE MENU OPTIONS */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 text-xs">
         
         {/* Monthly Reports */}
         <div 
@@ -238,6 +215,72 @@ export const MoreSettings: React.FC<MoreSettingsProps> = ({
             <span className="text-slate-400 font-bold">→</span>
           </div>
         )}
+
+        {/* Theme / Appearance switch (Light / Dark / System) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3.5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400">
+              {theme === 'dark' ? (
+                <Moon className="w-5 h-5" />
+              ) : theme === 'light' ? (
+                <Sun className="w-5 h-5 text-amber-500" />
+              ) : (
+                <Laptop className="w-5 h-5" />
+              )}
+            </div>
+            <div>
+              <p className="font-bold text-slate-900 dark:text-white">{t.theme}</p>
+              <p className="text-slate-400 text-[11px]">
+                {theme === 'dark' ? t.dark : theme === 'light' ? t.light : t.system} • Persisted in localStorage
+              </p>
+            </div>
+          </div>
+
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full sm:w-auto">
+            <button
+              id="btn-more-theme-light"
+              type="button"
+              onClick={() => setTheme('light')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                theme === 'light'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+              title="Switch to Light Mode"
+            >
+              <Sun className="w-3.5 h-3.5" />
+              <span>{t.light}</span>
+            </button>
+            <button
+              id="btn-more-theme-dark"
+              type="button"
+              onClick={() => setTheme('dark')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+              title="Switch to Dark Mode"
+            >
+              <Moon className="w-3.5 h-3.5" />
+              <span>{t.dark}</span>
+            </button>
+            <button
+              id="btn-more-theme-system"
+              type="button"
+              onClick={() => setTheme('system')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer ${
+                theme === 'system'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+              title="Follow System Theme"
+            >
+              <Laptop className="w-3.5 h-3.5" />
+              <span>{t.system}</span>
+            </button>
+          </div>
+        </div>
 
         {/* Language switch */}
         <div className="flex items-center justify-between p-4">

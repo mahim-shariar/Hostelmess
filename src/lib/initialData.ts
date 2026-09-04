@@ -8,14 +8,13 @@ import {
   AuditLogItem, 
   DEFAULT_MEMBER_PERMISSIONS, 
   ADMIN_PERMISSIONS,
-  DailyMenu,
   BazaarDutyItem
 } from '../types';
 
-export const DEMO_MESS_ID = 'mess_padma_2026';
+export const DEFAULT_MESS_ID = 'mess_padma_2026';
 
 export const INITIAL_MESS: Mess = {
-  id: DEMO_MESS_ID,
+  id: DEFAULT_MESS_ID,
   name: 'Padma Student Mess',
   location: 'Mirpur-10, Dhaka',
   adminId: 'user_mahim_admin',
@@ -46,7 +45,7 @@ export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'user_mahim_admin',
     userId: 'user_mahim_admin',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     name: 'Mahim (Manager)',
     email: 'mahim@hostel.edu',
     phone: '01711223344',
@@ -60,7 +59,7 @@ export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'user_rahim_member',
     userId: 'user_rahim_member',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     name: 'Rahim',
     email: 'rahim@hostel.edu',
     phone: '01811223344',
@@ -77,7 +76,7 @@ export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'user_karim_member',
     userId: 'user_karim_member',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     name: 'Karim',
     email: 'karim@hostel.edu',
     phone: '01911223344',
@@ -91,7 +90,7 @@ export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'user_tanvir_member',
     userId: 'user_tanvir_member',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     name: 'Tanvir',
     email: 'tanvir@hostel.edu',
     phone: '01611223344',
@@ -105,7 +104,7 @@ export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'user_sabbir_member',
     userId: 'user_sabbir_member',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     name: 'Sabbir',
     email: 'sabbir@hostel.edu',
     phone: '01511223344',
@@ -135,7 +134,7 @@ export function generateInitialMeals(): MealRecord[] {
 
       meals.push({
         id: `meal_${member.id}_${date}`,
-        messId: DEMO_MESS_ID,
+        messId: DEFAULT_MESS_ID,
         memberId: member.id,
         memberName: member.name,
         date,
@@ -158,7 +157,7 @@ export function generateInitialMeals(): MealRecord[] {
 export const INITIAL_EXPENSES: ExpenseRecord[] = [
   {
     id: 'exp_01',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 2500,
     type: 'food',
     category: 'Bazar',
@@ -173,7 +172,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   },
   {
     id: 'exp_02',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 3200,
     type: 'food',
     category: 'Meat',
@@ -188,7 +187,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   },
   {
     id: 'exp_03',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 3400,
     type: 'food',
     category: 'Rice',
@@ -203,7 +202,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   },
   {
     id: 'exp_04',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 1400,
     type: 'bills',
     category: 'Gas',
@@ -218,7 +217,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   },
   {
     id: 'exp_05',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 1000,
     type: 'bills',
     category: 'Internet',
@@ -233,7 +232,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   },
   {
     id: 'exp_06',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     amount: 1800,
     type: 'food',
     category: 'Fish',
@@ -251,7 +250,7 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
 export const INITIAL_PAYMENTS: PaymentRecord[] = [
   {
     id: 'pay_01',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     memberId: 'user_mahim_admin',
     memberName: 'Mahim (Manager)',
     amount: 3000,
@@ -263,7 +262,7 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
   },
   {
     id: 'pay_02',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     memberId: 'user_rahim_member',
     memberName: 'Rahim',
     amount: 3000,
@@ -276,7 +275,7 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
   },
   {
     id: 'pay_03',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     memberId: 'user_karim_member',
     memberName: 'Karim',
     amount: 2500,
@@ -289,7 +288,7 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
   },
   {
     id: 'pay_04',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     memberId: 'user_tanvir_member',
     memberName: 'Tanvir',
     amount: 3000,
@@ -302,7 +301,7 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
   },
   {
     id: 'pay_05',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     memberId: 'user_sabbir_member',
     memberName: 'Sabbir',
     amount: 2500,
@@ -317,7 +316,7 @@ export const INITIAL_PAYMENTS: PaymentRecord[] = [
 export const INITIAL_NOTICES: NoticeItem[] = [
   {
     id: 'notice_01',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     title: 'Monthly Mess Meeting & Bazar Duty',
     content: 'All members please attend the monthly meeting this Friday at 9:00 PM in the dining room. Next week bazar schedule will be finalized.',
     authorName: 'Mahim (Manager)',
@@ -327,7 +326,7 @@ export const INITIAL_NOTICES: NoticeItem[] = [
   },
   {
     id: 'notice_02',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     title: 'Tomorrow lunch will be served at 1:30 PM',
     content: 'Due to Friday Jummah prayer, tomorrow lunch will start at 1:30 PM. Please update your meal counts before 9:00 AM morning.',
     authorName: 'Mahim (Manager)',
@@ -340,7 +339,7 @@ export const INITIAL_NOTICES: NoticeItem[] = [
 export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
   {
     id: 'audit_01',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     action: 'Mess Created',
     userId: 'user_mahim_admin',
     userName: 'Mahim',
@@ -350,7 +349,7 @@ export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
   },
   {
     id: 'audit_02',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     action: 'Expense Added',
     userId: 'user_rahim_member',
     userName: 'Rahim',
@@ -360,7 +359,7 @@ export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
   },
   {
     id: 'audit_03',
-    messId: DEMO_MESS_ID,
+    messId: DEFAULT_MESS_ID,
     action: 'Payment Added',
     userId: 'user_karim_member',
     userName: 'Karim',
@@ -372,35 +371,6 @@ export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [
 
 const todayIso = new Date().toISOString().split('T')[0];
 const tomorrowDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
-export const INITIAL_DAILY_MENUS: Record<string, DailyMenu> = {
-  [todayIso]: {
-    date: todayIso,
-    breakfast: 'Egg Omelette / Paratha / Khichuri',
-    lunch: 'Desi Chicken Curry, Masoor Dal, Alu Bharta & Steamed Rice',
-    dinner: 'Rui Fish Jhol, Mixed Seasonal Vegetables & Steamed Rice',
-    cookNotes: 'Lunch starts at 1:30 PM. Please turn off meals before cutoff times if you will not eat.',
-    servingTimes: {
-      breakfast: '08:30 AM',
-      lunch: '01:30 PM',
-      dinner: '09:00 PM',
-    },
-    updatedAt: Date.now(),
-  },
-  [tomorrowDate]: {
-    date: tomorrowDate,
-    breakfast: 'Roti / Dal & Dim',
-    lunch: 'Beef Curry, Bhuna Khichuri & Begun Bhaja',
-    dinner: 'Egg Curry, Dal & Rice',
-    cookNotes: 'Friday Special Bhuna Khichuri & Beef for lunch.',
-    servingTimes: {
-      breakfast: '09:00 AM',
-      lunch: '02:00 PM',
-      dinner: '09:30 PM',
-    },
-    updatedAt: Date.now(),
-  }
-};
 
 export const INITIAL_BAZAAR_DUTIES: Record<string, BazaarDutyItem> = {
   [todayIso]: {

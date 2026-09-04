@@ -22,17 +22,21 @@ import {
   XCircle
 } from 'lucide-react';
 import { formatMonthDisplay } from '../../lib/accounting';
+import { BazaarDutyCard } from '../mess/BazaarDutyCard';
+import { QuickBazaarWidget } from '../expenses/QuickBazaarWidget';
 
 interface MemberDashboardProps {
   onGoToMeals: () => void;
   onGoToAccount: () => void;
   onAddExpense?: () => void;
+  onOpenQuickBazaar?: () => void;
 }
 
 export const MemberDashboard: React.FC<MemberDashboardProps> = ({ 
   onGoToMeals, 
   onGoToAccount,
-  onAddExpense 
+  onAddExpense,
+  onOpenQuickBazaar 
 }) => {
   const { 
     currentUser, 
@@ -162,7 +166,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
       )}
 
       {/* TODAY'S MEALS CARD */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
@@ -194,7 +198,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
         )}
 
         {/* Cutoff Rules Info Banner */}
-        <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-600 dark:text-slate-300">
+        <div className="flex items-center gap-2 p-2.5 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-600 dark:text-slate-300">
           <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>
             <strong>Meal Off Rules:</strong> Lunch can be turned off before <strong>9:00 AM</strong> • Dinner before <strong>4:00 PM</strong>.
@@ -202,7 +206,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
         </div>
 
         {/* 3 Meal Buttons: Breakfast, Lunch, Dinner */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-4 pt-1">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-1">
           
           {/* Breakfast */}
           <div className="flex flex-col items-center">
@@ -384,8 +388,17 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
         )}
       </div>
 
+      {/* DAILY BAZAAR INSTANT ENTRY WIDGET */}
+      <QuickBazaarWidget onOpenDetailedModal={onOpenQuickBazaar || onAddExpense} />
+
+      {/* DAILY BAZAAR (MARKET) DUTY ROSTER */}
+      <BazaarDutyCard 
+        onOpenAddExpense={onAddExpense}
+        onOpenQuickBazaar={onOpenQuickBazaar}
+      />
+
       {/* MY MONTHLY SUMMARY CARD (Requirement 7) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-bold text-slate-900 dark:text-white text-base tracking-tight">
@@ -497,7 +510,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
       </div>
 
       {/* Quick Links / Action Pills */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
         <button
           id="btn-quick-add-deposit-card"
           onClick={() => setIsAddDepositModalOpen(true)}

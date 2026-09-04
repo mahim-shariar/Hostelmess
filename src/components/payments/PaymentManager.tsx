@@ -128,7 +128,7 @@ export const PaymentManager: React.FC<PaymentManagerProps> = ({
       </div>
 
       {/* TOTAL DEPOSITS BANNER */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-3xl p-5 sm:p-6 shadow-md shadow-emerald-600/20 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-md shadow-emerald-600/20 flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold text-emerald-100 uppercase tracking-wider block mb-1">
             Total Deposits Collected ({formatMonthDisplay(selectedMonth, lang)})

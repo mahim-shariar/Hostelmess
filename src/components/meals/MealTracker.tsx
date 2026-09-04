@@ -178,10 +178,10 @@ export const MealTracker: React.FC = () => {
       </div>
 
       {/* CALENDAR TABLE (Requirement 9) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
         
         {/* Table Header */}
-        <div className="grid grid-cols-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3.5 border-b border-slate-200 dark:border-slate-800">
+        <div className="grid grid-cols-5 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3 sm:p-3.5 border-b border-slate-200 dark:border-slate-800">
           <div className="text-left pl-2">{t.date}</div>
           <div>{t.breakfast}</div>
           <div>{t.lunch}</div>

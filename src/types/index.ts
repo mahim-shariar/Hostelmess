@@ -200,20 +200,6 @@ export interface NotificationItem {
   read: boolean;
 }
 
-export interface DailyMenu {
-  date: string; // YYYY-MM-DD
-  breakfast?: string;
-  lunch?: string;
-  dinner?: string;
-  cookNotes?: string;
-  servingTimes?: {
-    breakfast?: string;
-    lunch?: string;
-    dinner?: string;
-  };
-  updatedAt?: number;
-}
-
 export interface BazaarDutyItem {
   date: string; // YYYY-MM-DD
   assignedMemberIds: string[];

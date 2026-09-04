@@ -169,7 +169,7 @@ export const ExpenseManager: React.FC<ExpenseManagerProps> = ({
       </div>
 
       {/* TOTAL EXPENSE HIGHLIGHT (Requirement 13) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
             {t.totalExpense}

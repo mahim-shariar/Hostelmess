@@ -146,7 +146,7 @@ export const MemberList: React.FC<MemberListProps> = ({
       </div>
 
       {/* MEMBER TABLE / CARDS (Requirement 21) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
         
         {/* Table Header for medium screens */}
         <div className="hidden sm:grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-50 dark:bg-slate-800/60 p-4 border-b border-slate-100 dark:border-slate-800">

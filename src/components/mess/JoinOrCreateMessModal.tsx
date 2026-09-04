@@ -250,7 +250,7 @@ export const JoinOrCreateMessModal: React.FC = () => {
                     />
                   </div>
                   <span className="text-[10px] text-slate-400 mt-1 block">
-                    (Try demo code: <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">MAHIM2026</span>)
+                    Enter the 6–8 character invite code shared by your manager or roommate.
                   </span>
                 </div>
 

@@ -12,7 +12,6 @@ import {
   Role,
   DEFAULT_MEMBER_PERMISSIONS,
   ADMIN_PERMISSIONS,
-  DailyMenu,
   BazaarDutyItem
 } from '../types';
 import { 
@@ -23,7 +22,6 @@ import {
   INITIAL_PAYMENTS, 
   INITIAL_NOTICES, 
   INITIAL_AUDIT_LOGS,
-  INITIAL_DAILY_MENUS,
   INITIAL_BAZAAR_DUTIES
 } from '../lib/initialData';
 import { calculateMonthAccounts, getCurrentMonthId } from '../lib/accounting';
@@ -76,14 +74,8 @@ interface AppContextType {
   setIsAddDepositModalOpen: (open: boolean) => void;
   isCookSummaryOpen: boolean;
   setIsCookSummaryOpen: (open: boolean) => void;
-  isEditMenuModalOpen: boolean;
-  setIsEditMenuModalOpen: (open: boolean) => void;
   isEditBazaarModalOpen: boolean;
   setIsEditBazaarModalOpen: (open: boolean) => void;
-
-  // Daily Menu & Cook Status
-  dailyMenus: Record<string, DailyMenu>;
-  updateDailyMenu: (date: string, menu: Partial<DailyMenu>) => void;
 
   // Daily Bazaar Duty Roster
   bazaarDuties: Record<string, BazaarDutyItem>;
@@ -200,14 +192,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else if (theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) root.classList.add('dark');
-      else root.classList.remove('dark');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyTheme = () => {
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else if (theme === 'light') {
+        root.classList.remove('dark');
+      } else {
+        if (mediaQuery.matches) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+
+    applyTheme();
+
+    if (theme === 'system') {
+      const listener = () => applyTheme();
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
     }
   }, [theme]);
 
@@ -231,7 +237,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isJoinCreateMessOpen, setIsJoinCreateMessOpen] = useState<boolean>(false);
   const [isAddDepositModalOpen, setIsAddDepositModalOpen] = useState<boolean>(false);
   const [isCookSummaryOpen, setIsCookSummaryOpen] = useState<boolean>(false);
-  const [isEditMenuModalOpen, setIsEditMenuModalOpen] = useState<boolean>(false);
   const [isEditBazaarModalOpen, setIsEditBazaarModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -378,31 +383,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
   });
 
-  const [dailyMenus, setDailyMenus] = useState<Record<string, DailyMenu>>(() => {
-    const saved = localStorage.getItem('mess_daily_menus');
-    return saved ? JSON.parse(saved) : INITIAL_DAILY_MENUS;
-  });
-
   const [bazaarDuties, setBazaarDuties] = useState<Record<string, BazaarDutyItem>>(() => {
     const saved = localStorage.getItem('mess_bazaar_duties');
     return saved ? JSON.parse(saved) : INITIAL_BAZAAR_DUTIES;
   });
-
-  const updateDailyMenu = (date: string, menuUpdate: Partial<DailyMenu>) => {
-    setDailyMenus(prev => {
-      const existing = prev[date] || { date };
-      const updated = {
-        ...existing,
-        ...menuUpdate,
-        date,
-        updatedAt: Date.now(),
-      };
-      const next = { ...prev, [date]: updated };
-      localStorage.setItem('mess_daily_menus', JSON.stringify(next));
-      return next;
-    });
-    pushNotification('Menu Updated', `Today's menu has been updated!`, 'info');
-  };
 
   const updateBazaarDuty = (date: string, dutyUpdate: Partial<BazaarDutyItem>) => {
     setBazaarDuties(prev => {
@@ -1103,12 +1087,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsAddDepositModalOpen,
         isCookSummaryOpen,
         setIsCookSummaryOpen,
-        isEditMenuModalOpen,
-        setIsEditMenuModalOpen,
         isEditBazaarModalOpen,
         setIsEditBazaarModalOpen,
-        dailyMenus,
-        updateDailyMenu,
         bazaarDuties,
         updateBazaarDuty,
         currentUser,

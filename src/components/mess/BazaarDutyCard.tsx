@@ -4,9 +4,13 @@ import { ShoppingCart, Calendar, UserCheck, PlusCircle, CheckCircle2, ArrowRight
 
 interface BazaarDutyCardProps {
   onOpenAddExpense?: () => void;
+  onOpenQuickBazaar?: () => void;
 }
 
-export const BazaarDutyCard: React.FC<BazaarDutyCardProps> = ({ onOpenAddExpense }) => {
+export const BazaarDutyCard: React.FC<BazaarDutyCardProps> = ({ 
+  onOpenAddExpense,
+  onOpenQuickBazaar 
+}) => {
   const { 
     bazaarDuties, 
     setIsEditBazaarModalOpen, 
@@ -39,7 +43,7 @@ export const BazaarDutyCard: React.FC<BazaarDutyCardProps> = ({ onOpenAddExpense
   const isCurrentMemberAssignedToday = todayDuty.assignedMemberIds?.includes(currentUser.id);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-4">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
@@ -132,15 +136,15 @@ export const BazaarDutyCard: React.FC<BazaarDutyCardProps> = ({ onOpenAddExpense
       </div>
 
       {/* Action to log bazaar cost directly */}
-      {onOpenAddExpense && (
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+      {(onOpenQuickBazaar || onOpenAddExpense) && (
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span className="text-xs text-slate-500 dark:text-slate-400">
             Did you finish today&apos;s shopping?
           </span>
           <button
             id="btn-log-bazaar-expense"
-            onClick={onOpenAddExpense}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-colors cursor-pointer"
+            onClick={onOpenQuickBazaar || onOpenAddExpense}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-colors cursor-pointer w-full sm:w-auto"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Record Bazar Cost</span>
