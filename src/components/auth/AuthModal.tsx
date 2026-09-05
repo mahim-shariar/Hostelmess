@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
 import { 
@@ -28,7 +28,11 @@ export const AuthModal: React.FC = () => {
     logout,
     currentUser,
     allMembers,
-    setIsJoinCreateMessOpen
+    setIsJoinCreateMessOpen,
+    pendingAuthAction,
+    authModalMode,
+    setAuthModalMode,
+    lang
   } = useApp();
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -39,6 +43,15 @@ export const AuthModal: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Sync mode with context
+  useEffect(() => {
+    if (isAuthModalOpen) {
+      setMode(authModalMode || 'signin');
+      setError(null);
+      setSuccessMsg(null);
+    }
+  }, [isAuthModalOpen, authModalMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +71,7 @@ export const AuthModal: React.FC = () => {
           setSuccessMsg('Account created successfully! Welcome to Mess Manager.');
           setTimeout(() => {
             setIsAuthModalOpen(false);
-            setIsJoinCreateMessOpen(true);
-          }, 800);
+          }, 700);
         } else {
           setError(res.error || 'Failed to create account');
         }
@@ -69,7 +81,7 @@ export const AuthModal: React.FC = () => {
           setSuccessMsg('Signed in successfully!');
           setTimeout(() => {
             setIsAuthModalOpen(false);
-          }, 800);
+          }, 700);
         } else {
           setError(res.error || 'Invalid credentials. Please check your username/email and password.');
         }
@@ -92,9 +104,7 @@ export const AuthModal: React.FC = () => {
         setSuccessMsg('Google sign-in successful!');
         setTimeout(() => {
           setIsAuthModalOpen(false);
-          // If the user does not have a mess yet, open the join/create mess modal
-          setIsJoinCreateMessOpen(true);
-        }, 800);
+        }, 700);
       } else {
         setError(res.error || 'Google sign-in was not completed.');
       }
@@ -168,12 +178,50 @@ export const AuthModal: React.FC = () => {
         ) : (
           /* Sign In or Sign Up Form */
           <>
+            {/* Context Notice if User is here to Create or Join Mess */}
+            {pendingAuthAction === 'create_mess' && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-start gap-2.5">
+                <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </div>
+                <div>
+                  <p className="font-bold text-xs">
+                    {lang === 'bn' ? '১ম ধাপ: মেস তৈরি করতে প্রথমে একটি একাউন্ট খুলুন' : 'Step 1 of 2: Create your account first'}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 leading-relaxed">
+                    {lang === 'bn' 
+                      ? 'একাউন্ট তৈরি সম্পন্ন হওয়ার সাথে সাথেই আপনি মেস সেটআপ ও ইনভাইট কোড তৈরি করতে পারবেন।'
+                      : 'Once your account is ready, you can immediately create your mess and invite members.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {pendingAuthAction === 'join_mess' && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-start gap-2.5">
+                <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </div>
+                <div>
+                  <p className="font-bold text-xs">
+                    {lang === 'bn' ? '১ম ধাপ: মেসে যোগ দিতে প্রথমে একটি একাউন্ট খুলুন' : 'Step 1 of 2: Create your account first'}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 leading-relaxed">
+                    {lang === 'bn' 
+                      ? 'একাউন্ট তৈরি শেষ হলে আপনার ম্যানেজারের দেওয়া ৬ ডিজিট কোড দিয়ে মেসে যুক্ত হতে পারবেন।'
+                      : 'Once your account is ready, you will be prompted to enter your manager’s invite code to join.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Mode switch tabs */}
             <div className="grid grid-cols-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
               <button
                 type="button"
                 onClick={() => {
                   setMode('signin');
+                  setAuthModalMode('signin');
                   setError(null);
                 }}
                 className={`py-2 rounded-lg font-bold transition-all cursor-pointer ${
@@ -188,6 +236,7 @@ export const AuthModal: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setMode('signup');
+                  setAuthModalMode('signup');
                   setError(null);
                 }}
                 className={`py-2 rounded-lg font-bold transition-all cursor-pointer ${

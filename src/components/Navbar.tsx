@@ -5,8 +5,6 @@ import {
   Users, 
   Calendar, 
   Globe, 
-  Moon, 
-  Sun, 
   Bell, 
   ChevronDown, 
   ShieldCheck, 
@@ -18,11 +16,12 @@ import {
 import { formatMonthDisplay } from '../lib/accounting';
 
 interface NavbarProps {
+  onGoToHome?: () => void;
   onOpenSettings: () => void;
   onOpenNotices: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenNotices }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onGoToHome, onOpenSettings, onOpenNotices }) => {
   const { 
     currentMess, 
     currentUser, 
@@ -31,8 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenNotices })
     setSelectedMonth, 
     lang, 
     setLang, 
-    theme, 
-    setTheme, 
     isOnline, 
     t, 
     notifications,
@@ -42,7 +39,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenNotices })
     authUser,
     setIsAuthModalOpen,
     setIsJoinCreateMessOpen,
-    logout
+    logout,
+    setViewMode,
+    openCreateMessFlow,
+    openJoinMessFlow
   } = useApp();
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -58,17 +58,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenNotices })
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2">
           
           {/* Left: App Brand & Logo */}
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-xs shrink-0">
+          <button 
+            id="btn-nav-home-brand"
+            type="button"
+            onClick={() => {
+              if (onGoToHome) {
+                onGoToHome();
+              }
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 sm:gap-2.5 min-w-0 text-left hover:opacity-85 transition-opacity cursor-pointer group"
+            title={lang === 'bn' ? `${currentMess.name} ড্যাশবোর্ড` : `${currentMess.name} Dashboard`}
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-sm shadow-emerald-600/20 shrink-0 group-hover:scale-105 transition-transform ring-1 ring-emerald-400/30">
               <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             
-            <div className="min-w-0">
-              <span className="font-bold text-slate-900 dark:text-white text-xs xs:text-sm sm:text-base tracking-tight truncate block">
-                {lang === 'bn' ? 'হোস্টেল মেস' : 'Hostel Mess'}
+            <div className="min-w-0 text-left">
+              <div className="flex items-center gap-1.5 leading-tight">
+                <span className="font-black text-slate-900 dark:text-white text-xs xs:text-sm sm:text-base tracking-tight truncate">
+                  Mess<span className="text-emerald-600 dark:text-emerald-400">Bari</span>
+                </span>
+                <span className="hidden xs:inline-block text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-mono uppercase">
+                  {lang === 'bn' ? 'মেসবাড়ি' : 'OS'}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold block leading-none mt-0.5 truncate max-w-[120px] sm:max-w-[200px]">
+                {currentMess.name}
               </span>
             </div>
-          </div>
+          </button>
 
           {/* Center: Month Selector */}
           <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 rounded-xl p-0.5 border border-slate-200/60 dark:border-slate-700/60 text-xs shrink-0">
@@ -99,16 +118,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenNotices })
             >
               <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span className="text-[11px] sm:text-xs">{lang === 'en' ? 'বাং' : 'EN'}</span>
-            </button>
-
-            {/* Theme Switch */}
-            <button
-              id="btn-switch-theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer active:scale-90"
-              title="Toggle Theme"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
             </button>
 
             {/* Notification Bell */}

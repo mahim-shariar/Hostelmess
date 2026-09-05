@@ -62,7 +62,7 @@ export const CookSummaryModal: React.FC = () => {
 📊 *Total Plates Today:* ${grandTotal}
 🛒 *Bazar Duty:* ${todayDuty?.assignedNames?.join(', ') || 'Self Managed'}
 
-_Generated automatically via Hostel & Mess Manager_`;
+_Generated automatically via MessBari_`;
   };
 
   // WhatsApp formatted string for monthly summary

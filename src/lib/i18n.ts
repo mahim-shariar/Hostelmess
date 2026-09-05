@@ -3,8 +3,8 @@ export type Language = 'en' | 'bn';
 export const translations = {
   en: {
     // App header & general
-    appName: 'Hostel & Mess Manager',
-    tagline: 'Simple, fast mess tracking for students',
+    appName: 'MessBari',
+    tagline: 'The Modern Hostel & Bachelor Mess Operating System',
     admin: 'Admin/Manager',
     member: 'Member',
     save: 'Save',
@@ -175,7 +175,7 @@ export const translations = {
     switchRole: 'Profile & Account',
 
     // Tutorial Steps
-    tut1Title: 'Welcome to Hostel & Mess Manager',
+    tut1Title: 'Welcome to MessBari',
     tut1Desc: 'Manage your mess meals, grocery expenses, and payments with zero accounting confusion.',
     tut2Title: "Record Daily Meals in 10 Seconds",
     tut2Desc: 'Simply tap Breakfast, Lunch, or Dinner on your Home screen. Toggle 1, 0.5, or 0.',
@@ -194,8 +194,8 @@ export const translations = {
 
   bn: {
     // App header & general
-    appName: 'হোস্টেল ও মেস ম্যানেজার',
-    tagline: 'শিক্ষার্থীদের জন্য সহজ ও দ্রুত মেস হিসাব',
+    appName: 'মেসবাড়ি (MessBari)',
+    tagline: 'মেস ও হোস্টেলের আধুনিক অপারেটিং প্ল্যাটফর্ম',
     admin: 'ম্যানেজার / অ্যাডমিন',
     member: 'মেম্বার / সদস্য',
     save: 'সংরক্ষণ করুন',
@@ -366,7 +366,7 @@ export const translations = {
     switchRole: 'প্রোফাইল ও অ্যাকাউন্ট',
 
     // Tutorial Steps
-    tut1Title: 'হোস্টেল ও মেস ম্যানেজারে স্বাগতম',
+    tut1Title: 'মেসবাড়ি (MessBari)-তে স্বাগতম',
     tut1Desc: 'মেসের মিল, বাজার খরচ এবং জমা-খরচের ঝামেলাহীন ডিজিটাল সমাধান।',
     tut2Title: '১০ সেকেন্ডে মিল এন্ট্রি',
     tut2Desc: 'হোম স্ক্রিন থেকেই ব্রেকফাস্ট, লাঞ্চ বা ডিনার বাটনে ট্যাপ করে সহজে মিল দিন (১, ০.৫ বা ০)।',

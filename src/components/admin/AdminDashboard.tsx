@@ -24,6 +24,7 @@ import { Modal } from '../ui/Modal';
 import confetti from 'canvas-confetti';
 import { BazaarDutyCard } from '../mess/BazaarDutyCard';
 import { QuickBazaarWidget } from '../expenses/QuickBazaarWidget';
+import { BazarCashFundSection } from '../bazar/BazarCashFundSection';
 
 interface AdminDashboardProps {
   onGoToMeals: () => void;
@@ -334,6 +335,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* 1ST-WEEK ৳1,000 BAZAR STARTER FUND & CASH IN HAND */}
+      <BazarCashFundSection />
 
       {/* DAILY BAZAAR INSTANT ENTRY WIDGET */}
       <QuickBazaarWidget onOpenDetailedModal={onOpenQuickBazaar || onOpenAddExpense} />

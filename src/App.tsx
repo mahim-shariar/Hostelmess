@@ -20,6 +20,7 @@ import { EditBazaarModal } from './components/mess/EditBazaarModal';
 import { MessHeaderCard } from './components/mess/MessHeaderCard';
 import { QuickBazaarModal } from './components/expenses/QuickBazaarModal';
 import { QuickBazaarFloatingButton } from './components/expenses/QuickBazaarFloatingButton';
+import { HomePage } from './components/home/HomePage';
 
 const AppContent: React.FC = () => {
   const { 
@@ -27,19 +28,19 @@ const AppContent: React.FC = () => {
     setTutorialOpen, 
     currentMess, 
     t,
-    setIsJoinCreateMessOpen,
+    viewMode,
+    setViewMode,
     authUser 
   } = useApp();
   const isAdmin = currentUser.role === 'admin';
 
-  // First-time visitor or fresh session: show Join or Create Mess modal
+  // If user is already logged in and has created or joined a mess, directly go to dashboard without showing homepage
   useEffect(() => {
-    const hasSeenWelcome = sessionStorage.getItem('mess_welcome_shown');
-    if (!hasSeenWelcome) {
-      setIsJoinCreateMessOpen(true);
-      sessionStorage.setItem('mess_welcome_shown', 'true');
+    const hasMess = localStorage.getItem('mess_user_has_mess') === 'true';
+    if (authUser && hasMess && viewMode === 'landing') {
+      setViewMode('app');
     }
-  }, []);
+  }, [authUser, viewMode, setViewMode]);
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<NavTab>(isAdmin ? 'dashboard' : 'home');
@@ -144,10 +145,29 @@ const AppContent: React.FC = () => {
     }
   };
 
+  // If in Landing / Home Page mode, render the Home Page experience
+  if (viewMode === 'landing') {
+    return (
+      <>
+        <HomePage />
+
+        {/* Authentication Modal */}
+        <AuthModal />
+
+        {/* Join or Create Mess Modal */}
+        <JoinOrCreateMessModal />
+
+        {/* Notification Toast */}
+        <Toast />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-150">
       {/* Top Navbar */}
       <Navbar
+        onGoToHome={() => setActiveTab(isAdmin ? 'dashboard' : 'home')}
         onOpenSettings={() => setActiveTab('more')}
         onOpenNotices={() => setActiveTab('more')}
       />

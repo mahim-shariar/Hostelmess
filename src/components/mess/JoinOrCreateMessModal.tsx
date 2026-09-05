@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../ui/Modal';
 import { 
@@ -25,16 +25,40 @@ export const JoinOrCreateMessModal: React.FC = () => {
     currentUser,
     authUser,
     createMess, 
-    joinMessByCode 
+    joinMessByCode,
+    joinCreateInitialTab,
+    openSignUpFlow,
+    openSignInFlow,
+    lang
   } = useApp();
 
+  const isBn = lang === 'bn';
   const [activeTab, setActiveTab] = useState<'join' | 'create'>('join');
+
+  // Sync tab with context when modal opens
+  useEffect(() => {
+    if (isJoinCreateMessOpen) {
+      if (joinCreateInitialTab) {
+        setActiveTab(joinCreateInitialTab);
+      }
+      setError(null);
+      setSuccessInfo(null);
+    }
+  }, [isJoinCreateMessOpen, joinCreateInitialTab]);
 
   // Join form state
   const [joinCode, setJoinCode] = useState('');
   const [joinMemberName, setJoinMemberName] = useState(authUser?.displayName || currentUser?.name || '');
   const [joinPhone, setJoinPhone] = useState(currentUser?.phone || '');
   const [joinStudentId, setJoinStudentId] = useState('');
+
+  // Keep member name in sync with authUser
+  useEffect(() => {
+    if (authUser?.displayName) {
+      setJoinMemberName(authUser.displayName);
+      setManagerName(authUser.displayName);
+    }
+  }, [authUser]);
 
   // Create form state
   const [messName, setMessName] = useState('');
@@ -180,6 +204,45 @@ export const JoinOrCreateMessModal: React.FC = () => {
             <p className="text-[11px] text-slate-500">
               Share this code with your fellow room members so they can join!
             </p>
+          </div>
+        ) : !authUser ? (
+          /* Authentication Required Gate */
+          <div className="p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center mx-auto">
+              <KeyRound className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                {isBn ? 'একাউন্ট তৈরি করা প্রয়োজন' : 'Account Required First'}
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed max-w-sm mx-auto">
+                {isBn 
+                  ? 'মেস তৈরি করতে অথবা কোনো মেসে যোগ দিতে প্রথমে একটি একাউন্ট খুলতে হবে।'
+                  : 'To create a new mess or join an existing one, you must first create an account.'}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsJoinCreateMessOpen(false);
+                  openSignUpFlow();
+                }}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
+              >
+                {isBn ? 'একাউন্ট খুলুন' : 'Create Account (Sign Up)'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsJoinCreateMessOpen(false);
+                  openSignInFlow();
+                }}
+                className="py-2.5 px-4 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                {isBn ? 'সাইন ইন' : 'Sign In'}
+              </button>
+            </div>
           </div>
         ) : (
           <>

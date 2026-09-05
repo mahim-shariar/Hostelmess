@@ -46,7 +46,7 @@ export const MessHeaderCard: React.FC<MessHeaderCardProps> = ({ className = '' }
   };
 
   const handleShareInvite = async () => {
-    const shareText = `Join our hostel mess "${currentMess.name}" on Hostel Mess Manager! Use Invite Code: #${inviteCode}`;
+    const shareText = `Join our hostel mess "${currentMess.name}" on MessBari! Use Invite Code: #${inviteCode}`;
     const shareUrl = window.location.href;
 
     if (navigator.share) {

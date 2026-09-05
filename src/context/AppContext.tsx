@@ -12,7 +12,9 @@ import {
   Role,
   DEFAULT_MEMBER_PERMISSIONS,
   ADMIN_PERMISSIONS,
-  BazaarDutyItem
+  BazaarDutyItem,
+  BazarCashHandover,
+  FirstWeekBazarDeposit
 } from '../types';
 import { 
   INITIAL_MESS, 
@@ -22,7 +24,9 @@ import {
   INITIAL_PAYMENTS, 
   INITIAL_NOTICES, 
   INITIAL_AUDIT_LOGS,
-  INITIAL_BAZAAR_DUTIES
+  INITIAL_BAZAAR_DUTIES,
+  INITIAL_FIRST_WEEK_DEPOSITS,
+  INITIAL_BAZAR_HANDOVERS
 } from '../lib/initialData';
 import { calculateMonthAccounts, getCurrentMonthId } from '../lib/accounting';
 import { Language, translations } from '../lib/i18n';
@@ -56,6 +60,20 @@ interface AppContextType {
   theme: 'light' | 'dark' | 'system';
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   isOnline: boolean;
+
+  // View Mode (Landing Page vs App Dashboard)
+  viewMode: 'landing' | 'app';
+  setViewMode: (mode: 'landing' | 'app') => void;
+  pendingAuthAction: 'create_mess' | 'join_mess' | null;
+  setPendingAuthAction: (action: 'create_mess' | 'join_mess' | null) => void;
+  authModalMode: 'signin' | 'signup';
+  setAuthModalMode: (mode: 'signin' | 'signup') => void;
+  joinCreateInitialTab: 'join' | 'create';
+  setJoinCreateInitialTab: (tab: 'join' | 'create') => void;
+  openCreateMessFlow: () => void;
+  openJoinMessFlow: () => void;
+  openSignInFlow: () => void;
+  openSignUpFlow: () => void;
 
   // Authentication & User Profile
   authUser: FirebaseUser | null;
@@ -164,6 +182,20 @@ interface AppContextType {
 
   // Switch demo profiles
   switchDemoProfile: (memberId: string) => void;
+
+  // 1st-Week 1,000 Tk Bazar Starter Fund & Cash Float
+  firstWeekDeposits: FirstWeekBazarDeposit[];
+  bazarCashHandovers: BazarCashHandover[];
+  firstWeekTargetPerMember: number;
+  totalFirstWeekCollected: number;
+  totalFirstWeekTarget: number;
+  totalBazarCashDisbursed: number;
+  totalBazarCashReturned: number;
+  remainingBazarCashInHand: number;
+  addBazarCashHandover: (shopperId: string, shopperName: string, cashTaken: number, note?: string, date?: string) => Promise<void>;
+  settleBazarCashHandover: (id: string, actualSpent: number, cashReturned: number, recordAsExpense?: boolean) => Promise<void>;
+  deleteBazarCashHandover: (id: string) => Promise<void>;
+  markFirstWeekDeposit: (memberId: string, paidAmount: number, method?: 'Cash' | 'bKash' | 'Nagad' | 'Bank' | 'Other', transactionId?: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -230,6 +262,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, []);
 
+  // View Mode: 'landing' (Home page) vs 'app' (Mess Dashboard)
+  const [viewMode, setViewModeState] = useState<'landing' | 'app'>(() => {
+    // If the user has already joined or created a mess, directly go to dashboard without showing the homepage
+    const hasMess = localStorage.getItem('mess_user_has_mess') === 'true';
+    if (hasMess) {
+      return 'app';
+    }
+    const saved = localStorage.getItem('mess_view_mode');
+    return saved === 'app' ? 'app' : 'landing';
+  });
+
+  const setViewMode = (mode: 'landing' | 'app') => {
+    setViewModeState(mode);
+    localStorage.setItem('mess_view_mode', mode);
+  };
+
+  // Pending action when user needs to create an account first
+  const [pendingAuthAction, setPendingAuthAction] = useState<'create_mess' | 'join_mess' | null>(null);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [joinCreateInitialTab, setJoinCreateInitialTab] = useState<'join' | 'create'>('join');
+
+  // Flow helper methods
+  const openCreateMessFlow = () => {
+    if (!authUser) {
+      setPendingAuthAction('create_mess');
+      setAuthModalMode('signup');
+      setIsAuthModalOpen(true);
+    } else {
+      setPendingAuthAction(null);
+      setJoinCreateInitialTab('create');
+      setIsJoinCreateMessOpen(true);
+      setViewMode('app');
+    }
+  };
+
+  const openJoinMessFlow = () => {
+    if (!authUser) {
+      setPendingAuthAction('join_mess');
+      setAuthModalMode('signup');
+      setIsAuthModalOpen(true);
+    } else {
+      setPendingAuthAction(null);
+      setJoinCreateInitialTab('join');
+      setIsJoinCreateMessOpen(true);
+      setViewMode('app');
+    }
+  };
+
+  const openSignInFlow = () => {
+    setPendingAuthAction(null);
+    setAuthModalMode('signin');
+    setIsAuthModalOpen(true);
+  };
+
+  const openSignUpFlow = () => {
+    setPendingAuthAction(null);
+    setAuthModalMode('signup');
+    setIsAuthModalOpen(true);
+  };
+
   // Firebase Auth State
   const [authUser, setAuthUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
@@ -251,11 +343,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (userSnap.exists()) {
             const userData = userSnap.data();
             if (userData.activeMessId) {
-              // User has an active mess
+              // User already has an active mess - directly go to dashboard without showing homepage!
+              localStorage.setItem('mess_user_has_mess', 'true');
+              localStorage.setItem('mess_active_mess_id', userData.activeMessId);
+              setViewModeState('app');
+              localStorage.setItem('mess_view_mode', 'app');
+
+              // Fetch mess info if available
+              try {
+                const messSnap = await getDoc(doc(db, 'messes', userData.activeMessId));
+                if (messSnap.exists()) {
+                  setCurrentMess(messSnap.data() as Mess);
+                }
+              } catch (e) {
+                console.warn('Mess fetch note:', e);
+              }
+              return;
             }
           }
         } catch (err) {
           console.warn('User profile fetch note:', err);
+        }
+
+        // If local storage recorded that the user has a mess, directly go to dashboard
+        if (localStorage.getItem('mess_user_has_mess') === 'true') {
+          setViewModeState('app');
+          localStorage.setItem('mess_view_mode', 'app');
         }
       }
     });
@@ -281,6 +394,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         } catch (e) {
           console.warn('Profile save note:', e);
         }
+
+        // Handle pending flow if user intended to create or join a mess
+        if (pendingAuthAction === 'create_mess') {
+          setJoinCreateInitialTab('create');
+          setIsJoinCreateMessOpen(true);
+          setPendingAuthAction(null);
+          setViewMode('app');
+        } else if (pendingAuthAction === 'join_mess') {
+          setJoinCreateInitialTab('join');
+          setIsJoinCreateMessOpen(true);
+          setPendingAuthAction(null);
+          setViewMode('app');
+        } else {
+          setViewMode('app');
+        }
       }
       return { success: true };
     } catch (err: any) {
@@ -294,6 +422,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // If username doesn't contain '@', append domain so Firebase Auth email/pass works seamlessly
       const email = usernameOrEmail.includes('@') ? usernameOrEmail : `${usernameOrEmail.toLowerCase().replace(/[^a-z0-9_]/g, '')}@hostelmess.local`;
       await signInWithEmailAndPassword(auth, email, pass);
+
+      // Handle pending flow
+      if (pendingAuthAction === 'create_mess') {
+        setJoinCreateInitialTab('create');
+        setIsJoinCreateMessOpen(true);
+        setPendingAuthAction(null);
+        setViewMode('app');
+      } else if (pendingAuthAction === 'join_mess') {
+        setJoinCreateInitialTab('join');
+        setIsJoinCreateMessOpen(true);
+        setPendingAuthAction(null);
+        setViewMode('app');
+      } else {
+        setViewMode('app');
+      }
+
       return { success: true };
     } catch (err: any) {
       console.error('Login error:', err);
@@ -315,6 +459,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           username: usernameOrEmail,
           createdAt: Date.now(),
         }, { merge: true });
+
+        // Handle pending flow
+        if (pendingAuthAction === 'create_mess') {
+          setJoinCreateInitialTab('create');
+          setIsJoinCreateMessOpen(true);
+          setPendingAuthAction(null);
+          setViewMode('app');
+        } else if (pendingAuthAction === 'join_mess') {
+          setJoinCreateInitialTab('join');
+          setIsJoinCreateMessOpen(true);
+          setPendingAuthAction(null);
+          setViewMode('app');
+        } else {
+          setViewMode('app');
+        }
       }
       return { success: true };
     } catch (err: any) {
@@ -327,6 +486,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       await signOut(auth);
       setAuthUser(null);
+      localStorage.removeItem('mess_user_has_mess');
+      localStorage.removeItem('mess_active_mess_id');
+      setViewMode('landing');
+      setIsAuthModalOpen(false);
+      setIsJoinCreateMessOpen(false);
     } catch (err) {
       console.error('Sign out error:', err);
     }
@@ -388,6 +552,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_BAZAAR_DUTIES;
   });
 
+  // 1st-Week 1,000 Tk Bazar Starter Fund records
+  const [firstWeekDeposits, setFirstWeekDeposits] = useState<FirstWeekBazarDeposit[]>(() => {
+    const saved = localStorage.getItem('mess_first_week_deposits');
+    return saved ? JSON.parse(saved) : INITIAL_FIRST_WEEK_DEPOSITS;
+  });
+
+  // Cash handed over for bazar (e.g. 3000 taka taken for bazar)
+  const [bazarCashHandovers, setBazarCashHandovers] = useState<BazarCashHandover[]>(() => {
+    const saved = localStorage.getItem('mess_bazar_handovers');
+    return saved ? JSON.parse(saved) : INITIAL_BAZAR_HANDOVERS;
+  });
+
   const updateBazaarDuty = (date: string, dutyUpdate: Partial<BazaarDutyItem>) => {
     setBazaarDuties(prev => {
       const existing = prev[date] || { date, assignedMemberIds: [], assignedNames: [] };
@@ -406,7 +582,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: 'notif_welcome',
-      title: 'Welcome to Hostel & Mess Manager',
+      title: 'Welcome to MessBari',
       message: 'Tap your breakfast, lunch or dinner to record today’s meal.',
       type: 'info',
       timestamp: Date.now() - 3600000,
@@ -463,6 +639,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('mess_audit_logs', JSON.stringify(auditLogs));
   }, [auditLogs]);
+
+  useEffect(() => {
+    localStorage.setItem('mess_first_week_deposits', JSON.stringify(firstWeekDeposits));
+  }, [firstWeekDeposits]);
+
+  useEffect(() => {
+    localStorage.setItem('mess_bazar_handovers', JSON.stringify(bazarCashHandovers));
+  }, [bazarCashHandovers]);
 
   // Sync Firestore document in background when online
   useEffect(() => {
@@ -528,6 +712,168 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [monthlyCalculations, currentUser.id]);
 
   const isMonthClosed = Boolean(monthlyAccounts[selectedMonth]?.isClosed);
+
+  // --- 1st-Week 1,000 Tk Bazar Starter Fund & Live Cash Float Calculations ---
+  const firstWeekTargetPerMember = 1000;
+
+  const totalFirstWeekTarget = useMemo(() => {
+    return allMembers.filter(m => m.status === 'active').length * firstWeekTargetPerMember;
+  }, [allMembers, firstWeekTargetPerMember]);
+
+  const currentMonthFirstWeekDeposits = useMemo(() => {
+    return firstWeekDeposits.filter(d => d.monthId === selectedMonth);
+  }, [firstWeekDeposits, selectedMonth]);
+
+  const totalFirstWeekCollected = useMemo(() => {
+    return currentMonthFirstWeekDeposits
+      .filter(d => d.status === 'paid')
+      .reduce((sum, d) => sum + (d.paidAmount || 0), 0);
+  }, [currentMonthFirstWeekDeposits]);
+
+  const currentMonthBazarHandovers = useMemo(() => {
+    return bazarCashHandovers.filter(h => h.monthId === selectedMonth);
+  }, [bazarCashHandovers, selectedMonth]);
+
+  const totalBazarCashDisbursed = useMemo(() => {
+    return currentMonthBazarHandovers.reduce((sum, h) => sum + (h.cashTaken || 0), 0);
+  }, [currentMonthBazarHandovers]);
+
+  const totalBazarCashReturned = useMemo(() => {
+    return currentMonthBazarHandovers.reduce((sum, h) => sum + (h.cashReturned || 0), 0);
+  }, [currentMonthBazarHandovers]);
+
+  // Remaining Cash Left in Mess Fund:
+  // Total 1st-week starter pool - money disbursed for bazar + money returned after shopping
+  const remainingBazarCashInHand = useMemo(() => {
+    return totalFirstWeekCollected - totalBazarCashDisbursed + totalBazarCashReturned;
+  }, [totalFirstWeekCollected, totalBazarCashDisbursed, totalBazarCashReturned]);
+
+  // Add Cash Handover (e.g. Shakib takes 3000 taka for bazar)
+  const addBazarCashHandover = async (
+    shopperId: string, 
+    shopperName: string, 
+    cashTaken: number, 
+    note?: string, 
+    date?: string
+  ) => {
+    const newHandover: BazarCashHandover = {
+      id: 'bch_' + Date.now(),
+      messId: currentMess.id,
+      monthId: selectedMonth,
+      date: date || new Date().toISOString().split('T')[0],
+      shopperId,
+      shopperName,
+      cashTaken,
+      actualSpent: 0,
+      cashReturned: 0,
+      status: 'shopping',
+      note: note || `Bazar cash taken by ${shopperName}`,
+      createdAt: Date.now(),
+    };
+    setBazarCashHandovers(prev => [newHandover, ...prev]);
+    pushAuditLog('Bazar Cash Handed Over', `${shopperName} took ৳${cashTaken} for bazar`, undefined, `৳${cashTaken}`);
+    pushNotification('Bazar Cash Handover', `${shopperName} took ৳${cashTaken} cash for today's market. Remaining in fund: ৳${remainingBazarCashInHand - cashTaken}`, 'info');
+  };
+
+  // Settle Bazar Cash Handover (e.g. spent 2750, returned 250)
+  const settleBazarCashHandover = async (
+    id: string, 
+    actualSpent: number, 
+    cashReturned: number, 
+    recordAsExpense = true
+  ) => {
+    const target = bazarCashHandovers.find(h => h.id === id);
+    if (!target) return;
+
+    setBazarCashHandovers(prev => prev.map(h => {
+      if (h.id === id) {
+        return {
+          ...h,
+          actualSpent,
+          cashReturned,
+          status: 'settled',
+        };
+      }
+      return h;
+    }));
+
+    if (recordAsExpense && actualSpent > 0) {
+      await addExpense({
+        amount: actualSpent,
+        type: 'food',
+        category: 'Bazar',
+        description: `Bazar by ${target.shopperName}: ${target.note || 'Market items'} (Handover Settled)`,
+        date: target.date,
+        paidBy: target.shopperId,
+        paidByName: target.shopperName,
+        paymentMethod: 'Cash',
+        status: 'approved',
+      });
+    }
+
+    pushAuditLog('Bazar Cash Settled', `${target.shopperName} spent ৳${actualSpent}, returned ৳${cashReturned}`);
+    pushNotification('Bazar Settled', `${target.shopperName} completed bazar. Spent ৳${actualSpent}, returned ৳${cashReturned} to fund.`, 'success');
+  };
+
+  const deleteBazarCashHandover = async (id: string) => {
+    setBazarCashHandovers(prev => prev.filter(h => h.id !== id));
+    pushAuditLog('Bazar Handover Removed', `Record ${id} deleted`);
+  };
+
+  // Mark 1st-Week 1,000 Tk Deposit
+  const markFirstWeekDeposit = async (
+    memberId: string, 
+    paidAmount: number, 
+    method: 'Cash' | 'bKash' | 'Nagad' | 'Bank' | 'Other' = 'Cash', 
+    transactionId?: string
+  ) => {
+    const member = allMembers.find(m => m.id === memberId);
+    const memberName = member ? member.name : 'Member';
+
+    setFirstWeekDeposits(prev => {
+      const exists = prev.find(d => d.memberId === memberId && d.monthId === selectedMonth);
+      if (exists) {
+        return prev.map(d => d.id === exists.id ? {
+          ...d,
+          paidAmount,
+          status: paidAmount >= 1000 ? 'paid' : 'pending',
+          paidDate: new Date().toISOString().split('T')[0],
+          paymentMethod: method,
+          transactionId,
+        } : d);
+      } else {
+        const newDeposit: FirstWeekBazarDeposit = {
+          id: 'fwd_' + Date.now(),
+          messId: currentMess.id,
+          monthId: selectedMonth,
+          memberId,
+          memberName,
+          requiredAmount: 1000,
+          paidAmount,
+          status: (paidAmount >= 1000 ? 'paid' : 'pending') as 'paid' | 'pending',
+          paidDate: new Date().toISOString().split('T')[0],
+          paymentMethod: method,
+          transactionId,
+        };
+        return [...prev, newDeposit];
+      }
+    });
+
+    if (paidAmount > 0) {
+      await addPayment({
+        memberId,
+        memberName,
+        amount: paidAmount,
+        date: new Date().toISOString().split('T')[0],
+        paymentMethod: method,
+        transactionId,
+        note: '1st-Week ৳1,000 Bazar Starter Fund Deposit',
+      });
+    }
+
+    pushAuditLog('1st-Week Bazar Deposit', `${memberName} paid ৳${paidAmount} starter bazar deposit`);
+    pushNotification('Bazar Fund Deposit', `${memberName} deposited ৳${paidAmount} for 1st-week bazar fund.`, 'success');
+  };
 
   // Check if meal is locked based on cutoff time
   const isMealLocked = useCallback((dateStr: string, mealType: 'breakfast' | 'lunch' | 'dinner'): boolean => {
@@ -962,6 +1308,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
+    // Set persistence to bypass homepage on future visits
+    localStorage.setItem('mess_user_has_mess', 'true');
+    localStorage.setItem('mess_active_mess_id', newMessId);
+    localStorage.setItem('mess_view_mode', 'app');
+    setViewModeState('app');
+
     pushAuditLog('Mess Created', name, undefined, `Code: ${inviteCode}`);
     return inviteCode;
   };
@@ -1011,6 +1363,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
 
+      // Set persistence to bypass homepage on future visits
+      localStorage.setItem('mess_user_has_mess', 'true');
+      localStorage.setItem('mess_active_mess_id', currentMess.id);
+      localStorage.setItem('mess_view_mode', 'app');
+      setViewModeState('app');
+
       pushAuditLog('Member Joined via Code', memberName, undefined, `Code: ${code}`);
       pushNotification('New Member Joined', `${memberName} joined the mess.`, 'info');
       return { success: true, messName: currentMess.name };
@@ -1046,6 +1404,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setAllMembers(prev => [...prev, newMember]);
           setCurrentUser(newMember);
 
+          // Set persistence to bypass homepage on future visits
+          localStorage.setItem('mess_user_has_mess', 'true');
+          localStorage.setItem('mess_active_mess_id', fetchedMess.id);
+          localStorage.setItem('mess_view_mode', 'app');
+          setViewModeState('app');
+
           return { success: true, messName: fetchedMess.name };
         }
       } catch (err: any) {
@@ -1073,6 +1437,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         theme,
         setTheme,
         isOnline,
+        viewMode,
+        setViewMode,
+        pendingAuthAction,
+        setPendingAuthAction,
+        authModalMode,
+        setAuthModalMode,
+        joinCreateInitialTab,
+        setJoinCreateInitialTab,
+        openCreateMessFlow,
+        openJoinMessFlow,
+        openSignInFlow,
+        openSignUpFlow,
         authUser,
         authLoading,
         loginWithGoogle,
@@ -1129,6 +1505,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tutorialOpen,
         setTutorialOpen,
         switchDemoProfile,
+        firstWeekDeposits,
+        bazarCashHandovers,
+        firstWeekTargetPerMember,
+        totalFirstWeekCollected,
+        totalFirstWeekTarget,
+        totalBazarCashDisbursed,
+        totalBazarCashReturned,
+        remainingBazarCashInHand,
+        addBazarCashHandover,
+        settleBazarCashHandover,
+        deleteBazarCashHandover,
+        markFirstWeekDeposit,
       }}
     >
       {children}

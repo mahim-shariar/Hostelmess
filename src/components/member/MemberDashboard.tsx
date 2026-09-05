@@ -24,6 +24,7 @@ import {
 import { formatMonthDisplay } from '../../lib/accounting';
 import { BazaarDutyCard } from '../mess/BazaarDutyCard';
 import { QuickBazaarWidget } from '../expenses/QuickBazaarWidget';
+import { BazarCashFundSection } from '../bazar/BazarCashFundSection';
 
 interface MemberDashboardProps {
   onGoToMeals: () => void;
@@ -387,6 +388,9 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
           </div>
         )}
       </div>
+
+      {/* 1ST-WEEK ৳1,000 BAZAR STARTER FUND & REMAINING CASH IN HAND (Live for every member) */}
+      <BazarCashFundSection />
 
       {/* DAILY BAZAAR INSTANT ENTRY WIDGET */}
       <QuickBazaarWidget onOpenDetailedModal={onOpenQuickBazaar || onAddExpense} />

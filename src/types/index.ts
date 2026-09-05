@@ -208,3 +208,32 @@ export interface BazaarDutyItem {
   notes?: string;
   isCompleted?: boolean;
 }
+
+export interface BazarCashHandover {
+  id: string;
+  messId: string;
+  monthId: string; // YYYY-MM
+  date: string; // YYYY-MM-DD
+  shopperId: string;
+  shopperName: string;
+  cashTaken: number; // e.g. 3000 taka taken for bazar
+  actualSpent?: number; // e.g. 2750 taka
+  cashReturned?: number; // e.g. 250 taka returned to manager fund
+  status: 'shopping' | 'settled';
+  note?: string;
+  createdAt: number;
+}
+
+export interface FirstWeekBazarDeposit {
+  id: string;
+  messId: string;
+  monthId: string; // YYYY-MM
+  memberId: string;
+  memberName: string;
+  requiredAmount: number; // 1000 taka default
+  paidAmount: number; // 1000 or custom
+  status: 'paid' | 'pending';
+  paidDate?: string;
+  paymentMethod?: 'Cash' | 'bKash' | 'Nagad' | 'Bank' | 'Other';
+  transactionId?: string;
+}
